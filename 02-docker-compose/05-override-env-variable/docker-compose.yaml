@@ -1,0 +1,9 @@
+version: '3'
+services:
+  squares:
+    image: mzcoder7/squares
+    environment:
+      # - NUMBER=${NUM}
+      # default value
+      # - NUMBER=${NUM:-7}
+      - NUMBER
