@@ -2,34 +2,32 @@ package com.mz.tests.vendorportal;
 
 import com.mz.pages.vendorportal.DashboardPage;
 import com.mz.pages.vendorportal.LoginPage;
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import com.mz.tests.AbstractTest;
+import com.mz.tests.vendorportal.model.VendorPortalTestData;
+import com.mz.util.JsonUtil;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-public class VendorPortalTest {
-    private WebDriver driver;
+public class VendorPortalTest extends AbstractTest {
     private LoginPage loginPage;
     private DashboardPage dashboardPage;
+    private VendorPortalTestData testData;
 
     @BeforeTest
-    public void setDriver() {
-//        driver setup
-        WebDriverManager.chromedriver().driverVersion("127.0.6533.88").setup();
-        this.driver = new ChromeDriver();
+    @Parameters("testDataPath")
+    public void setPageObjects(String testDataPath) {
         this.loginPage = new LoginPage(driver);
         this.dashboardPage = new DashboardPage(driver);
-        driver.manage().window().maximize();
+        this.testData = JsonUtil.getTestData(testDataPath);
     }
 
     @Test
     public void loginTest() {
         loginPage.goTo("https://d1uh9e7cu07ukd.cloudfront.net/selenium-docker/vendor-app/index.html");
         Assert.assertTrue(loginPage.isAt());
-        loginPage.login("sam", "sam");
+        loginPage.login(testData.username(), testData.password());
     }
 
     @Test(dependsOnMethods = "loginTest")
@@ -37,24 +35,19 @@ public class VendorPortalTest {
         Assert.assertTrue(dashboardPage.isAt());
 
 //        finance metrics
-        Assert.assertEquals(dashboardPage.getMonthlyEarning(), "$40,000");
-        Assert.assertEquals(dashboardPage.getAnnualEarning(), "$215,000");
-        Assert.assertEquals(dashboardPage.getProfitMargin(), "50%");
-        Assert.assertEquals(dashboardPage.getAvailableInventory(), "18");
+        Assert.assertEquals(dashboardPage.getMonthlyEarning(), testData.monthlyEarning());
+        Assert.assertEquals(dashboardPage.getAnnualEarning(), testData.annualEarning());
+        Assert.assertEquals(dashboardPage.getProfitMargin(), testData.profitMargin());
+        Assert.assertEquals(dashboardPage.getAvailableInventory(), testData.availableInventory());
 
 //        order history search
-        dashboardPage.searchOrderHistoryBy("adams");
-        Assert.assertEquals(dashboardPage.getSearchResultsCount(), 8);
+        dashboardPage.searchOrderHistoryBy(testData.searchKeyword());
+        Assert.assertEquals(dashboardPage.getSearchResultsCount(), testData.searchResultsCount());
     }
 
     @Test(dependsOnMethods = "dashboardTest")
     public void logoutTest() {
         dashboardPage.logout();
         Assert.assertTrue(loginPage.isAt());
-    }
-
-    @AfterTest
-    public void quitDriver() {
-        this.driver.quit();
     }
 }
