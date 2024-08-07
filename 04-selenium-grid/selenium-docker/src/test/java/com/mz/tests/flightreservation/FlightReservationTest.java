@@ -3,6 +3,8 @@ package com.mz.tests.flightreservation;
 import com.mz.pages.flightreservation.*;
 import com.mz.tests.AbstractTest;
 import com.mz.tests.flightreservation.model.FlightReservationTestData;
+import com.mz.util.Config;
+import com.mz.util.Constants;
 import com.mz.util.JsonUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
@@ -21,7 +23,7 @@ public class FlightReservationTest extends AbstractTest {
     @Test
     public void userRegistrationTest() {
         RegistrationPage registrationPage = new RegistrationPage(driver);
-        registrationPage.goTo("https://d1uh9e7cu07ukd.cloudfront.net/selenium-docker/reservation-app/index.html#");
+        registrationPage.goTo(Config.get(Constants.FLIGHT_RESERVATION_URL));
         Assert.assertTrue(registrationPage.isAt());
         registrationPage.enterUserDetails(testData.firstName(), testData.lastName());
         registrationPage.enterUserCredentials(testData.email(), testData.password());
