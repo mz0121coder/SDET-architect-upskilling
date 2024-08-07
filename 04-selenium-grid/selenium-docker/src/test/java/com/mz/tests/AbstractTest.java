@@ -1,5 +1,6 @@
 package com.mz.tests;
 
+import com.mz.listener.TestListener;
 import com.mz.util.Config;
 import com.mz.util.Constants;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -11,13 +12,16 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.ITestContext;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Listeners;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
+@Listeners({TestListener.class})
 public class AbstractTest {
     private static final Logger log = LoggerFactory.getLogger(AbstractTest.class);
     protected WebDriver driver;
@@ -28,9 +32,10 @@ public class AbstractTest {
     }
 
     @BeforeTest
-    public void setDriver() throws MalformedURLException {
+    public void setDriver(ITestContext context) throws MalformedURLException {
 
         this.driver = Boolean.parseBoolean(Config.get(Constants.GRID_ENABLED)) ? getRemoteDriver() : getLocalDriver();
+        context.setAttribute(Constants.DRIVER, this.driver);
 
         this.driver.manage().window().maximize();
     }
@@ -58,7 +63,7 @@ public class AbstractTest {
     public void quitDriver() {
         this.driver.quit();
     }
-    
+
 //    @AfterMethod
 //    public void sleep() {
 //        Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(5));
